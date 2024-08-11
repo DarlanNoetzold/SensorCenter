@@ -2,11 +2,11 @@ package tech.noetzold.SensorCenter.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -14,13 +14,15 @@ import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.xml.sax.ErrorHandler;
 
 import java.util.Map;
 
 @Configuration
 @EnableKafka
 public class KafkaConsumerConfig {
+
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String kafkaUrl;
 
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
@@ -32,7 +34,7 @@ public class KafkaConsumerConfig {
 
         return new DefaultKafkaConsumerFactory<>(
                 Map.of(
-                        ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092",
+                        ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaUrl,
                         ConsumerConfig.GROUP_ID_CONFIG, "your-group-id",
                         ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class,
                         ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class,
