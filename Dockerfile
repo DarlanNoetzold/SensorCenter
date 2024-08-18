@@ -1,20 +1,20 @@
-FROM debian:bullseye-slim AS builder
-
-# Instalar o OpenJDK 22
-RUN apt-get update && apt-get install -y openjdk-22-jdk
+# Usar uma imagem baseada no Debian para compilar o projeto Java
+FROM openjdk:22-jdk AS maven_build
 
 # Definir o diretório de trabalho
 WORKDIR /app
 
-# Compilar a aplicação Java
+# Copiar o código fonte para o contêiner
 COPY . /app
+
+# Compilar o projeto Java
 RUN ./mvnw clean install
 
 # Nova etapa para criar a imagem final
 FROM openjdk:22-jdk
 
 # Copiar o arquivo JAR da aplicação para o contêiner
-COPY --from=builder /app/target/SensorCenter-0.0.1-SNAPSHOT.jar /app/sensorcenter.jar
+COPY --from=maven_build /app/target/SensorCenter-0.0.1-SNAPSHOT.jar /app/sensorcenter.jar
 
 # Expor a porta que a aplicação usa
 EXPOSE 8081
