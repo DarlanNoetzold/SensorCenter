@@ -7,6 +7,9 @@ WORKDIR /app
 # Copiar o código fonte para o contêiner
 COPY . /app
 
+# Dar permissão de execução ao script mvnw
+RUN chmod +x ./mvnw
+
 # Compilar o projeto Java
 RUN ./mvnw clean install
 
