@@ -1,17 +1,20 @@
-# Etapa de construção do JAR
-FROM maven:3.8.5-openjdk-17 AS build
-WORKDIR /app
-COPY . /app
-RUN mvn clean install
+FROM debian:bullseye-slim AS builder
 
-# Usar uma imagem baseada no Debian com OpenJDK para compilar e executar a aplicação Java
-FROM openjdk:22-jdk
+# Instalar o OpenJDK 22
+RUN apt-get update && apt-get install -y openjdk-22-jdk
 
 # Definir o diretório de trabalho
 WORKDIR /app
 
-# Copiar o arquivo JAR da aplicação para o contêiner gerado na etapa de build
-COPY --from=build /app/target/SensorCenter-0.0.1-SNAPSHOT.jar /app/sensorcenter.jar
+# Compilar a aplicação Java
+COPY . /app
+RUN ./mvnw clean install
+
+# Nova etapa para criar a imagem final
+FROM openjdk:22-jdk
+
+# Copiar o arquivo JAR da aplicação para o contêiner
+COPY --from=builder /app/target/SensorCenter-0.0.1-SNAPSHOT.jar /app/sensorcenter.jar
 
 # Expor a porta que a aplicação usa
 EXPOSE 8081
