@@ -18,4 +18,5 @@ public class ProcessedData {
     private String coordinates;
     private LocalDateTime timestamp;
 
+    private String processorId;
 }
